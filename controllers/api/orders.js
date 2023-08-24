@@ -1,4 +1,4 @@
-const Order = require("../../models/order");
+const Order = require('../../models/order');
 // const Item = require('../../models/item');
 
 module.exports = {
@@ -6,9 +6,9 @@ module.exports = {
   addToCart,
   setItemQtyInCart,
   checkout,
+  history
 };
 
-// A cart is the unpaid order for a user
 async function cart(req, res) {
   const cart = await Order.getCart(req.user._id);
   res.json(cart);
@@ -17,8 +17,6 @@ async function cart(req, res) {
 // Add an item to the cart
 async function addToCart(req, res) {
   const cart = await Order.getCart(req.user._id);
-  // The promise resolves to the document, which we already have
-  // in the cart variable, so no need to create another variable...
   await cart.addItemToCart(req.params.id);
   res.json(cart);
 }
@@ -37,3 +35,11 @@ async function checkout(req, res) {
   await cart.save();
   res.json(cart);
 }
+
+async function history(req,res) {try{const userId=req.user._id;
+const orders=await Order.find({user:userId, isPaid:true});
+res.json(orders);
+}
+catch {
+  res.status(400).json("order fetch issue");
+}}
